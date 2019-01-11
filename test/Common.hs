@@ -9,8 +9,9 @@ import           Data.Text    (Text)
 import           Elm          (ElmType)
 import           GHC.Generics (Generic)
 import           Servant.API  ((:<|>), (:>), Capture, Get, GetNoContent, Header,
-                               Headers, JSON, NoContent, Post, PostNoContent,
-                               Put, QueryFlag, QueryParam, QueryParams, ReqBody)
+                               Header', Headers, JSON, NoContent, Post,
+                               PostNoContent, Put, QueryFlag, QueryParam,
+                               QueryParam', QueryParams, ReqBody, Required)
 
 data Book = Book
     { title :: String
@@ -35,6 +36,7 @@ type TestApi =
          :> QueryFlag "published"
          :> QueryParam "sort" String
          :> QueryParam "year" Int
+         :> QueryParam' '[Required] "category" String
          :> QueryParams "filters" (Maybe Bool)
          :> Get '[JSON] [Book]
   :<|> "books"
@@ -45,8 +47,11 @@ type TestApi =
   :<|> "nothing"
          :> Put '[JSON] () -- old way to specify no content
   :<|> "with-a-header"
+         :> Header "Cookie" String
          :> Header "myStringHeader" String
          :> Header "MyIntHeader" Int
+         :> Header' '[Required] "MyRequiredStringHeader" String
+         :> Header' '[Required] "MyRequiredIntHeader" Int
          :> Get '[JSON] String
   :<|> "with-a-response-header"
          :> Get '[JSON] (Headers '[Header "myResponse" String] String)

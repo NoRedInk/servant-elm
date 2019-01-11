@@ -6,13 +6,13 @@ import Json.Decode exposing (..)
 import Url
 
 
-getBooks : (Result (Maybe (Http.Metadata, String), Http.Error) (List (Book)) -> msg) -> Bool -> Maybe (String) -> Maybe (Int) -> List (Maybe (Bool)) -> Cmd msg
-getBooks toMsg query_published query_sort query_year query_filters =
+getBooks : (Result (Maybe (Http.Metadata, String), Http.Error) (List (Book)) -> msg) -> Bool -> Maybe (String) -> Maybe (Int) -> String -> List (Maybe (Bool)) -> Cmd msg
+getBooks toMsg query_published query_sort query_year query_category query_filters =
     let
         params =
             List.filter (not << String.isEmpty)
                 [ if query_published then
-                    "query_published="
+                    "published="
                   else
                     ""
                 , query_sort
@@ -21,8 +21,11 @@ getBooks toMsg query_published query_sort query_year query_filters =
                 , query_year
                     |> Maybe.map (String.fromInt >>Url.percentEncode >> (++) "year=")
                     |> Maybe.withDefault ""
+                , Just query_category
+                    |> Maybe.map (Url.percentEncode >> (++) "category=")
+                    |> Maybe.withDefault ""
                 , query_filters
-                    |> List.map (\val -> "query_filters[]=" ++ (val |> Maybe.map (String.fromBool) |> Maybe.withDefault "" |> Url.percentEncode))
+                    |> List.map (\val -> "filters[]=" ++ (val |> Maybe.map (String.fromBool) >> Maybe.withDefault "" |> Url.percentEncode))
                     |> String.join "&"
                 ]
     in
