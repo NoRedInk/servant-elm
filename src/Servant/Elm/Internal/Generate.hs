@@ -348,7 +348,7 @@ mkLetParams opts request =
               argType = qarg ^. F.queryArgName . F.argType
             in
                 name <$>
-                indent 4 ("|> List.map" <+> parens (backslash <> "val ->" <+> dquotes (name <> "[]=") <+> "++ (val |>" <+> toStringSrc "|>" opts argType <+> "Url.percentEncode)") <$>
+                indent 4 ("|> List.map" <+> parens (backslash <> "val ->" <+> dquotes (elmName <> "[]=") <+> "++ (val |>" <+> toStringSrc "|>" opts argType <+> "Url.percentEncode)") <$>
                       "|> String.join" <+> dquotes "&")
       where
         name = elmQueryArg qarg
