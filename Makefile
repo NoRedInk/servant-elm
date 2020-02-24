@@ -47,3 +47,11 @@ clean:
 	      examples/e2e-tests/elm/Generated/Api.elm \
 	      examples/giphy/elm/Generated/GiphyApi.elm \
 	      examples/readme-example/my-elm-dir/Generated/MyApi.elm
+
+
+shell.nix: release.nix
+
+release.nix: default.nix
+
+default.nix: servant-elm.cabal
+	nix-shell --pure -p cabal2nix --run "cabal2nix ." > $@
