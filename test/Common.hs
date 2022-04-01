@@ -39,9 +39,9 @@ type TestApi =
          :> Get '[JSON] [Book]
   :<|> "books"
          :> ReqBody '[JSON] Book
-         :> PostNoContent '[JSON] NoContent
+         :> PostNoContent -- '[JSON] NoContent
   :<|> "nothing"
-         :> GetNoContent '[JSON] NoContent
+         :> GetNoContent -- '[JSON] NoContent
   :<|> "nothing"
          :> Put '[JSON] () -- old way to specify no content
   :<|> "with-a-header"
