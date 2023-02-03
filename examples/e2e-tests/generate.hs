@@ -44,7 +44,7 @@ type Api
     :> Get '[JSON] Response
   :<|> "status"
     :> "204"
-    :> GetNoContent '[JSON] NoContent
+    :> GetNoContent
   :<|> "post"
     :> ReqBody '[JSON] MessageBody
     :> Post '[JSON] ResponseWithJson

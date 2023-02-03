@@ -90,7 +90,8 @@ getIp toMsg =
                             (decodeString decodeResponse body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =
@@ -124,7 +125,8 @@ getIpSimulated toMsg =
                             (decodeString decodeResponse body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =
@@ -159,7 +161,8 @@ getStatus204 toMsg =
                                 Ok (NoContent)
                             else
                                 Err (Just (metadata, body_), Http.BadBody <| "Expected the response body to be empty, but it was '" ++ body_ ++ "'.")
-                            )
+                            
+                )
         , timeout =
             Nothing
         , tracker =
@@ -195,7 +198,8 @@ getStatus204Simulated toMsg =
                                 Ok (NoContent)
                             else
                                 Err (Just (metadata, body_), Http.BadBody <| "Expected the response body to be empty, but it was '" ++ body_ ++ "'.")
-                            )
+                            
+                )
         , timeout =
             Nothing
         , tracker =
@@ -228,7 +232,8 @@ postPost toMsg body =
                             (decodeString decodeResponseWithJson body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =
@@ -262,7 +267,8 @@ postPostSimulated toMsg body =
                             (decodeString decodeResponseWithJson body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =
@@ -307,7 +313,8 @@ getGet toMsg query_q =
                                 (decodeString decodeResponseWithArgs body_)
                                     |> Result.mapError Json.Decode.errorToString
                                     |> Result.mapError Http.BadBody
-                                    |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                    |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                    )
             , timeout =
                 Nothing
             , tracker =
@@ -353,7 +360,8 @@ getGetSimulated toMsg query_q =
                                 (decodeString decodeResponseWithArgs body_)
                                     |> Result.mapError Json.Decode.errorToString
                                     |> Result.mapError Http.BadBody
-                                    |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                    |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                    )
             , timeout =
                 Nothing
             , tracker =
@@ -386,7 +394,8 @@ getByPath toMsg capture_path =
                             (decodeString decodeResponse body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =
@@ -420,7 +429,8 @@ getByPathSimulated toMsg capture_path =
                             (decodeString decodeResponse body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
-                                |> Result.mapError (Tuple.pair (Just (metadata, body_))))
+                                |> Result.mapError (Tuple.pair (Just (metadata, body_)))
+                )
         , timeout =
             Nothing
         , tracker =

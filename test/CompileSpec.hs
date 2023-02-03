@@ -34,7 +34,7 @@ spec = do
               "source-directories": [
                   "."
               ],
-              "elm-version": "0.19.0",
+              "elm-version": "0.19.1",
               "dependencies": {
                   "direct": {
                       "avh4/elm-program-test": "3.2.0",
@@ -65,6 +65,7 @@ spec = do
         |]
         let generated =
               T.intercalate "\n\n" $
+                "module Api exposing (..)" :
                 defElmImports :
                 [ toElmTypeSource (Proxy :: Proxy NoContent)
                 , toElmTypeSource (Proxy :: Proxy Book)
@@ -73,4 +74,4 @@ spec = do
                 ] ++
                 generateElmForAPI testApi
         T.writeFile "Api.elm" generated
-        callCommand "elm make Api.elm --output api.js"
+        callCommand "elm make Api.elm --output /dev/null"
