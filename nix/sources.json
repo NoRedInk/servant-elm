@@ -1,14 +1,14 @@
 {
     "nixpkgs": {
-        "branch": "release-22.05",
+        "branch": "ghc-darwin-loadarchive-fix",
         "description": "Nix Packages collection",
         "homepage": "",
-        "owner": "NixOS",
+        "owner": "jkachmar",
         "repo": "nixpkgs",
-        "rev": "0874168639713f547c05947c76124f78441ea46c",
-        "sha256": "0gw5l5bj3zcgxhp7ki1jafy6sl5nk4vr43hal94lhi15kg2vfmfy",
+        "rev": "e9d090fcd60d3005d2c33db8ac03d8e40ec392b3",
+        "sha256": "0ik6hgf4cqi4hixplga3ycl2zs7jyp18qj6bm54ddd32jx5rlhy5",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/0874168639713f547c05947c76124f78441ea46c.tar.gz",
+        "url": "https://github.com/jkachmar/nixpkgs/archive/e9d090fcd60d3005d2c33db8ac03d8e40ec392b3.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
