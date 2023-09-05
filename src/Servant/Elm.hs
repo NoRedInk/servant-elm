@@ -18,6 +18,8 @@ module Servant.Elm
        , UrlPrefix(..)
        , defElmOptions
        , defElmImports
+       , renderUrlEncoder
+       , URLEncodable
        -- * Convenience re-exports from the "Elm" module
        , Spec(Spec)
        , ElmType
@@ -34,3 +36,4 @@ import           Servant.Elm.Internal.Generate (ElmOptions (..), UrlPrefix (..),
 import           Data.Proxy                    (Proxy (Proxy))
 import           Elm                           (ElmType, Spec (Spec),
                                                 specsToDir)
+import           Servant.Elm.Internal.Encodable (URLEncodable, renderUrlEncoder)

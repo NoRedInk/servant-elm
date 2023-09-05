@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
@@ -10,7 +11,7 @@ import           Elm          (ElmType)
 import           GHC.Generics (Generic)
 import           Servant.API  ((:<|>), (:>), Capture, Get, GetNoContent, Header,
                                Headers, JSON, NoContent, Post, PostNoContent,
-                               Put, QueryFlag, QueryParam, QueryParams, ReqBody)
+                               Put, QueryFlag, QueryParam, QueryParams, ReqBody, ToHttpApiData(..))
 
 data Book = Book
     { title :: String
@@ -23,6 +24,15 @@ newtype Author = Author String
   deriving (Generic)
 
 instance ElmType Author
+
+data Location = Home | School | Library deriving (Generic)
+
+instance ToHttpApiData Location where
+    toQueryParam Home    = "home"
+    toQueryParam School  = "school"
+    toQueryParam Library = "library"
+
+instance ElmType Location
 
 type TestApi =
        "one"
@@ -58,6 +68,9 @@ type TestApi =
   :<|> "books-by-author"
          :> Capture "author" Author
          :> Get '[JSON] Book
+  :<|> "books"
+         :> Capture "location" Location
+         :> Get '[JSON] [Book]
 
 testApi :: Proxy TestApi
 testApi = Proxy

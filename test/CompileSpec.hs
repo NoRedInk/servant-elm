@@ -17,7 +17,7 @@ import           Servant.API                  (NoContent)
 import           Servant.Elm
 import           System.Process
 
-import Common (Author, Book, testApi)
+import Common (Author, Book, Location, testApi)
 
 main :: IO ()
 main =
@@ -72,6 +72,8 @@ spec = do
                 , toElmDecoderSource (Proxy :: Proxy Book)
                 , toElmEncoderSource (Proxy :: Proxy Book)
                 , toElmTypeSource (Proxy :: Proxy Author)
+                , toElmTypeSource (Proxy :: Proxy Location)
+                , renderUrlEncoder (Proxy :: Proxy Location)
                 ] ++
                 generateElmForAPI testApi
         T.writeFile "Api.elm" generated

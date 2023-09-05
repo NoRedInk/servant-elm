@@ -490,8 +490,12 @@ mkUrl opts segments =
           let
             -- Don't use "toString" on Elm Strings, otherwise we get extraneous quotes.
             toStringSrc' = toStringSrc "|>" opts (arg ^. F.argType)
+            comment = case arg ^. F.argType of
+              ElmDatatype name datatype
+                | Elm.isEnumeration datatype -> pretty $ " -- stringFrom" <> name <> " should be generated separately, by using Servant.Elm.renderUrlEncoder"
+              _ -> ""
           in
-            elmCaptureArg s <+> "|>" <+> toStringSrc' <+> "Url.percentEncode"
+            elmCaptureArg s <+> "|>" <+> toStringSrc' <+> "Url.percentEncode" <> comment
 
 
 mkQueryParams :: F.Req ElmDatatype -> Doc
@@ -532,6 +536,8 @@ toStringSrcTypes operator opts (ElmDatatype _typeName (NamedConstructor construc
     let primitiveToString = toStringSrcTypes operator opts (ElmPrimitive primitiveType)
      in "\\(" <> constructorName <> " inner) -> " <> primitiveToString <> " inner"
 toStringSrcTypes operator opts (ElmPrimitive (EList argType)) = toStringSrcTypes operator opts argType
+toStringSrcTypes _ _ (ElmDatatype name datatype)
+    | Elm.isEnumeration datatype = "stringFrom" <> name
 toStringSrcTypes _ opts argType
     | isElmStringType opts argType   = "identity"
     | isElmIntType opts argType   = "String.fromInt"

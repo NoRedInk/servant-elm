@@ -17,7 +17,7 @@ import           Servant.Elm
 import           Test.Hspec                (Spec, describe, hspec, it)
 import           Test.HUnit                (Assertion, assertEqual)
 
-import           Common                    (testApi)
+import           Common                    (testApi, Location)
 
 
 main :: IO ()
@@ -109,6 +109,13 @@ spec = do
                               "import Url\n" <>
                               "import String.Conversions as String\n" <>
                               "import Json.Decode exposing (..)\n\n\n"
+                            )
+                          , ( "test/elm-sources/getBooksByLocation.elm"
+                            , "module GetBooksByLocation exposing (..)\n\n" <>
+                              "import Http\n" <>
+                              "import ProgramTest\n\n" <>
+                               renderUrlEncoder (Proxy :: Proxy Location) <>
+                              "\n\n"
                             )
                           ]
                   let generated = map (<> "\n") (generateElmForAPI testApi)

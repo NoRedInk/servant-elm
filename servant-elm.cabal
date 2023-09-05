@@ -30,6 +30,7 @@ library
                      , Servant.Elm.Internal.Foreign
                      , Servant.Elm.Internal.Generate
                      , Servant.Elm.Internal.Orphans
+                     , Servant.Elm.Internal.Encodable
   build-depends:       base >= 4.7 && < 5
                      , elm-export
                      , lens
@@ -37,6 +38,7 @@ library
                      , servant-foreign >= 0.8
                      , text
                      , wl-pprint-text
+                     , generic-data
   ghc-options:         -Wall
   default-language:    Haskell2010
 
