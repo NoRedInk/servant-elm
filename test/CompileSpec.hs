@@ -17,7 +17,7 @@ import           Servant.API                  (NoContent)
 import           Servant.Elm
 import           System.Process
 
-import Common (Book, testApi)
+import Common (Author, Book, testApi)
 
 main :: IO ()
 main =
@@ -26,7 +26,7 @@ main =
 spec :: Test.Hspec.Spec
 spec = do
   describe "generateElmForAPI" $ do
-    it "creates compilable javascript" $ do
+    it "creates compilable Elm" $ do
       inTempDirectory $ do
         writeFile "elm.json" $ unindent $ [i|
           {
@@ -34,7 +34,7 @@ spec = do
               "source-directories": [
                   "."
               ],
-              "elm-version": "0.19.0",
+              "elm-version": "0.19.1",
               "dependencies": {
                   "direct": {
                       "avh4/elm-program-test": "3.2.0",
@@ -65,12 +65,14 @@ spec = do
         |]
         let generated =
               T.intercalate "\n\n" $
-                defElmImports :
-                [ toElmTypeSource (Proxy :: Proxy NoContent)
+                [ "module Api exposing (..)"
+                , defElmImports
+                , toElmTypeSource (Proxy :: Proxy NoContent)
                 , toElmTypeSource (Proxy :: Proxy Book)
                 , toElmDecoderSource (Proxy :: Proxy Book)
                 , toElmEncoderSource (Proxy :: Proxy Book)
+                , toElmTypeSource (Proxy :: Proxy Author)
                 ] ++
                 generateElmForAPI testApi
         T.writeFile "Api.elm" generated
-        callCommand "elm make Api.elm --output api.js"
+        callCommand "elm make Api.elm --output=/dev/null"

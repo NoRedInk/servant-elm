@@ -100,7 +100,17 @@ spec = do
                               "import SimulatedEffect.Http\n" <>
                               "import ProgramTest\n" <>
                               "import String.Conversions as String\n" <>
-                              "import Json.Decode exposing (..)\n\n\n")]
+                              "import Json.Decode exposing (..)\n\n\n")
+                          , ( "test/elm-sources/getBooksByAuthor.elm"
+                            , "module GetBooksByAuthor exposing (..)\n\n" <>
+                              "import Http\n" <>
+                              "import SimulatedEffect.Http\n" <>
+                              "import ProgramTest\n" <>
+                              "import Url\n" <>
+                              "import String.Conversions as String\n" <>
+                              "import Json.Decode exposing (..)\n\n\n"
+                            )
+                          ]
                   let generated = map (<> "\n") (generateElmForAPI testApi)
                   generated `itemsShouldBe` expected
            it "with dynamic URLs" $
