@@ -24,6 +24,11 @@ newtype Author = Author String
 
 instance ElmType Author
 
+newtype Id = Id Int
+  deriving (Generic)
+
+instance ElmType Id
+
 type TestApi =
        "one"
          :> Get '[JSON] Int
@@ -57,6 +62,7 @@ type TestApi =
          :> Get '[JSON] (Headers '[Header "myResponse" String] String)
   :<|> "books-by-author"
          :> Capture "author" Author
+         :> Header "Id" Id
          :> Get '[JSON] Book
 
 testApi :: Proxy TestApi

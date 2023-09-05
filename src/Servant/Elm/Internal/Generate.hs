@@ -530,7 +530,7 @@ toStringSrcTypes _ _ (ElmPrimitive (EList (ElmPrimitive EChar))) = "identity"
 -- This matches on newtypes and recursively calls for the inner type
 toStringSrcTypes operator opts (ElmDatatype _typeName (NamedConstructor constructorName (ElmPrimitiveRef primitiveType))) =
     let primitiveToString = toStringSrcTypes operator opts (ElmPrimitive primitiveType)
-     in "\\(" <> constructorName <> " inner) -> " <> primitiveToString <> " inner"
+     in "(\\(" <> constructorName <> " inner) -> " <> primitiveToString <> " inner)"
 toStringSrcTypes operator opts (ElmPrimitive (EList argType)) = toStringSrcTypes operator opts argType
 toStringSrcTypes _ opts argType
     | isElmStringType opts argType   = "identity"
