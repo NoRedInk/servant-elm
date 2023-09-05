@@ -13,7 +13,7 @@ import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified Data.Text.Lazy               as L
 import qualified Data.Text.Encoding           as T
-import           Elm                          (ElmDatatype(..), ElmPrimitive(..))
+import           Elm                          (ElmDatatype(..), ElmPrimitive(..), ElmConstructor(..), ElmValue(..))
 import qualified Elm
 import           Servant.API                  (NoContent (..))
 import           Servant.Elm.Internal.Foreign (LangElm, getEndpoints)
@@ -527,6 +527,10 @@ toStringSrcTypes operator opts (ElmPrimitive (EMaybe argType)) = "Maybe.map (" <
  -- [Char] == String so we can just use identity here.
  -- We can't return `""` here, because this string might be nested in a `Maybe` or `List`.
 toStringSrcTypes _ _ (ElmPrimitive (EList (ElmPrimitive EChar))) = "identity"
+-- This matches on newtypes and recursively calls for the inner type
+toStringSrcTypes operator opts (ElmDatatype _typeName (NamedConstructor constructorName (ElmPrimitiveRef primitiveType))) =
+    let primitiveToString = toStringSrcTypes operator opts (ElmPrimitive primitiveType)
+     in "\\(" <> constructorName <> " inner) -> " <> primitiveToString <> " inner"
 toStringSrcTypes operator opts (ElmPrimitive (EList argType)) = toStringSrcTypes operator opts argType
 toStringSrcTypes _ opts argType
     | isElmStringType opts argType   = "identity"
