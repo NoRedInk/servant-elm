@@ -34,7 +34,7 @@ spec = do
               "source-directories": [
                   "."
               ],
-              "elm-version": "0.19.0",
+              "elm-version": "0.19.1",
               "dependencies": {
                   "direct": {
                       "avh4/elm-program-test": "3.2.0",
