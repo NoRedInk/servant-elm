@@ -65,8 +65,9 @@ spec = do
         |]
         let generated =
               T.intercalate "\n\n" $
-                defElmImports :
-                [ toElmTypeSource (Proxy :: Proxy NoContent)
+                [ "module Api exposing (..)"
+                , defElmImports
+                , toElmTypeSource (Proxy :: Proxy NoContent)
                 , toElmTypeSource (Proxy :: Proxy Book)
                 , toElmDecoderSource (Proxy :: Proxy Book)
                 , toElmEncoderSource (Proxy :: Proxy Book)
@@ -74,4 +75,4 @@ spec = do
                 ] ++
                 generateElmForAPI testApi
         T.writeFile "Api.elm" generated
-        callCommand "elm make Api.elm --output api.js"
+        callCommand "elm make Api.elm --output=/dev/null"
