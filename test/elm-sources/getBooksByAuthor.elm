@@ -8,18 +8,19 @@ import String.Conversions as String
 import Json.Decode exposing (..)
 
 
-getBooksbyauthorByAuthor : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Author -> Cmd msg
-getBooksbyauthorByAuthor toMsg capture_author =
+getBooksbyauthorByAuthor : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Id -> Author -> Cmd msg
+getBooksbyauthorByAuthor toMsg header_Id capture_author =
     Http.request
         { method =
             "GET"
         , headers =
-            []
+            [ Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
+            ]
         , url =
             String.join "/"
                 [ ""
                 , "books-by-author"
-                , capture_author |> \(Author inner) -> identity inner |> Url.percentEncode
+                , capture_author |> (\(Author inner) -> identity inner) |> Url.percentEncode
                 ]
         , body =
             Http.emptyBody
@@ -44,18 +45,19 @@ getBooksbyauthorByAuthor toMsg capture_author =
         }
 
 
-getBooksbyauthorByAuthorSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Author -> ProgramTest.SimulatedEffect msg
-getBooksbyauthorByAuthorSimulated toMsg capture_author =
+getBooksbyauthorByAuthorSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Id -> Author -> ProgramTest.SimulatedEffect msg
+getBooksbyauthorByAuthorSimulated toMsg header_Id capture_author =
     SimulatedEffect.Http.request
         { method =
             "GET"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
+            ]
         , url =
             String.join "/"
                 [ ""
                 , "books-by-author"
-                , capture_author |> \(Author inner) -> identity inner |> Url.percentEncode
+                , capture_author |> (\(Author inner) -> identity inner) |> Url.percentEncode
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
