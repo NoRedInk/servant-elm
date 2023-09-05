@@ -19,6 +19,11 @@ data Book = Book
 instance ToJSON Book
 instance ElmType Book
 
+newtype Author = Author String
+  deriving (Generic)
+
+instance ElmType Author
+
 type TestApi =
        "one"
          :> Get '[JSON] Int
@@ -50,6 +55,9 @@ type TestApi =
          :> Get '[JSON] String
   :<|> "with-a-response-header"
          :> Get '[JSON] (Headers '[Header "myResponse" String] String)
+  :<|> "books-by-author"
+         :> Capture "author" Author
+         :> Get '[JSON] Book
 
 testApi :: Proxy TestApi
 testApi = Proxy
