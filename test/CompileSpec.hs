@@ -26,7 +26,7 @@ main =
 spec :: Test.Hspec.Spec
 spec = do
   describe "generateElmForAPI" $ do
-    it "creates compilable javascript" $ do
+    it "creates compilable Elm" $ do
       inTempDirectory $ do
         writeFile "elm.json" $ unindent $ [i|
           {
