@@ -128,6 +128,7 @@ defElmImports =
     , "import Json.Encode"
     , "import Http"
     , "import SimulatedEffect.Http"
+    , "import SimulatedEffect.Task"
     , "import ProgramTest"
     , "import String.Conversions as String"
     , "import Task exposing (Task)"
@@ -169,7 +170,12 @@ generateElmForRequest opts request =
     funcDef =
       vsep
         [ fnName <+> ":" <+> typeSignature
-        , fnName <+> args <+> equals
+        , fnName <+> "toMsg" <+> args <+> equals
+        , indent i (taskFnName <+> args <+> "|>")
+        , indent (i*2) "Task.attempt toMsg"
+        , "\n\n"
+        , taskFnName <+> ":" <+> taskTypeSignature
+        , taskFnName <+> args <+> equals
         , case letParams of
             Just params ->
               indent i
@@ -182,7 +188,12 @@ generateElmForRequest opts request =
               indent i elmRequest
         , "\n\n"
         , fnNameSimulated <+> ":" <+> typeSignatureSimulated
-        , fnNameSimulated <+> args <+> equals
+        , fnNameSimulated <+> "toMsg" <+> args <+> equals
+        , indent i (taskFnNameSimulated <+> args <+> "|>")
+        , indent (i*2) "SimulatedEffect.Task.attempt toMsg"
+        , "\n\n"
+        , taskFnNameSimulated <+> ":" <+> taskTypeSignatureSimulated
+        , taskFnNameSimulated <+> args <+> equals
         , case letParams of
             Just params ->
               indent i
@@ -199,7 +210,13 @@ generateElmForRequest opts request =
       request ^. F.reqFuncName . to (T.replace "-" "" . F.camelCase) . to stext
 
     typeSignature =
-      mkTypeSignature opts "Task" request
+      mkTypeSignature opts (SigResult "Cmd") request
+
+    taskFnName =
+      fnName <> "Task"
+
+    taskTypeSignature =
+      mkTypeSignature opts (SigTask "Task") request
 
     args =
       mkArgs opts request
@@ -214,16 +231,25 @@ generateElmForRequest opts request =
       fnName <> "Simulated"
 
     typeSignatureSimulated =
-      mkTypeSignature opts "ProgramTest.SimulatedTask" request
+      mkTypeSignature opts (SigResult "ProgramTest.SimulatedEffect") request
+
+    taskFnNameSimulated = 
+      fnNameSimulated <> "Task"
+
+    taskTypeSignatureSimulated =
+      mkTypeSignature opts (SigTask "ProgramTest.SimulatedTask") request
 
     elmRequestSimulated =
       mkRequest "SimulatedEffect.Http" opts request
 
+data SignatureType
+  = SigTask Doc
+  | SigResult Doc 
 
-mkTypeSignature :: ElmOptions -> Doc -> F.Req ElmDatatype -> Doc
-mkTypeSignature opts taskType request =
+mkTypeSignature :: ElmOptions -> SignatureType -> F.Req ElmDatatype -> Doc
+mkTypeSignature opts signatureType request =
   (hsep . punctuate " ->" . concat)
-    [ catMaybes [urlPrefixType]
+    [ catMaybes [msgType, urlPrefixType]
     , headerTypes
     , urlCaptureTypes
     , queryTypes
@@ -265,16 +291,29 @@ mkTypeSignature opts taskType request =
     bodyType =
         fmap elmTypeRef $ request ^. F.reqBody
         
+    msgType :: Maybe Doc
+    msgType = 
+      case signatureType of 
+        SigTask _ -> 
+          Nothing
+        SigResult _ -> do
+          result <- fmap elmTypeRef $ request ^. F.reqReturnType
+          pure (parens ("Result (Maybe (Http.Metadata, String), Http.Error)" <+> parens result <+> "-> msg"))
+
     returnType :: Doc
     returnType =
-      let okType = 
-            case fmap elmTypeRef $ request ^. F.reqReturnType of 
-              Nothing -> 
-                "()"
+      case signatureType of 
+        SigTask taskType -> 
+          let okType = 
+                case fmap elmTypeRef $ request ^. F.reqReturnType of 
+                  Nothing -> 
+                    "()"
 
-              Just elmOkType -> 
-                parens elmOkType
-      in taskType <+> "(Maybe (Http.Metadata, String), Http.Error)" <+> okType
+                  Just elmOkType -> 
+                    parens elmOkType
+          in taskType <+> "(Maybe (Http.Metadata, String), Http.Error)" <+> okType
+        SigResult effectType -> 
+          effectType <+> "msg"
 
 
 elmHeaderArg :: F.HeaderArg ElmDatatype -> Doc
