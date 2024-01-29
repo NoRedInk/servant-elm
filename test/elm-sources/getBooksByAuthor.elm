@@ -10,7 +10,13 @@ import Json.Decode exposing (..)
 
 getBooksbyauthorByAuthor : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Id -> Author -> Cmd msg
 getBooksbyauthorByAuthor toMsg header_Id capture_author =
-    Http.request
+    getBooksbyauthorByAuthorTask header_Id capture_author |>
+        Task.attempt toMsg
+
+
+getBooksbyauthorByAuthorTask : Id -> Author -> Task (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksbyauthorByAuthorTask header_Id capture_author =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -24,8 +30,8 @@ getBooksbyauthorByAuthor toMsg header_Id capture_author =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -40,14 +46,18 @@ getBooksbyauthorByAuthor toMsg header_Id capture_author =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getBooksbyauthorByAuthorSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Id -> Author -> ProgramTest.SimulatedEffect msg
 getBooksbyauthorByAuthorSimulated toMsg header_Id capture_author =
-    SimulatedEffect.Http.request
+    getBooksbyauthorByAuthorSimulatedTask header_Id capture_author |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getBooksbyauthorByAuthorSimulatedTask : Id -> Author -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksbyauthorByAuthorSimulatedTask header_Id capture_author =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -61,8 +71,8 @@ getBooksbyauthorByAuthorSimulated toMsg header_Id capture_author =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -76,7 +86,5 @@ getBooksbyauthorByAuthorSimulated toMsg header_Id capture_author =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

@@ -9,7 +9,13 @@ import Json.Decode exposing (..)
 
 getWitharesponseheader : (Result (Maybe (Http.Metadata, String), Http.Error) (String) -> msg) -> Cmd msg
 getWitharesponseheader toMsg =
-    Http.request
+    getWitharesponseheaderTask |>
+        Task.attempt toMsg
+
+
+getWitharesponseheaderTask : Task (Maybe (Http.Metadata, String), Http.Error) (String)
+getWitharesponseheaderTask =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -21,8 +27,8 @@ getWitharesponseheader toMsg =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -37,14 +43,18 @@ getWitharesponseheader toMsg =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getWitharesponseheaderSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (String) -> msg) -> ProgramTest.SimulatedEffect msg
 getWitharesponseheaderSimulated toMsg =
-    SimulatedEffect.Http.request
+    getWitharesponseheaderSimulatedTask |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getWitharesponseheaderSimulatedTask : ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (String)
+getWitharesponseheaderSimulatedTask =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -56,8 +66,8 @@ getWitharesponseheaderSimulated toMsg =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -71,7 +81,5 @@ getWitharesponseheaderSimulated toMsg =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

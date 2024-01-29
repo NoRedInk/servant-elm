@@ -9,7 +9,13 @@ import Json.Decode exposing (..)
 
 getOne : (Result (Maybe (Http.Metadata, String), Http.Error) (Int) -> msg) -> Cmd msg
 getOne toMsg =
-    Http.request
+    getOneTask |>
+        Task.attempt toMsg
+
+
+getOneTask : Task (Maybe (Http.Metadata, String), Http.Error) (Int)
+getOneTask =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -21,8 +27,8 @@ getOne toMsg =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -37,14 +43,18 @@ getOne toMsg =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getOneSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Int) -> msg) -> ProgramTest.SimulatedEffect msg
 getOneSimulated toMsg =
-    SimulatedEffect.Http.request
+    getOneSimulatedTask |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getOneSimulatedTask : ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Int)
+getOneSimulatedTask =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -56,8 +66,8 @@ getOneSimulated toMsg =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -71,7 +81,5 @@ getOneSimulated toMsg =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

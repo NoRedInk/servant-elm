@@ -9,7 +9,13 @@ import Json.Decode exposing (..)
 
 getWithaheader : (Result (Maybe (Http.Metadata, String), Http.Error) (String) -> msg) -> String -> Int -> Cmd msg
 getWithaheader toMsg header_myStringHeader header_MyIntHeader =
-    Http.request
+    getWithaheaderTask header_myStringHeader header_MyIntHeader |>
+        Task.attempt toMsg
+
+
+getWithaheaderTask : String -> Int -> Task (Maybe (Http.Metadata, String), Http.Error) (String)
+getWithaheaderTask header_myStringHeader header_MyIntHeader =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -23,8 +29,8 @@ getWithaheader toMsg header_myStringHeader header_MyIntHeader =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -39,14 +45,18 @@ getWithaheader toMsg header_myStringHeader header_MyIntHeader =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getWithaheaderSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (String) -> msg) -> String -> Int -> ProgramTest.SimulatedEffect msg
 getWithaheaderSimulated toMsg header_myStringHeader header_MyIntHeader =
-    SimulatedEffect.Http.request
+    getWithaheaderSimulatedTask header_myStringHeader header_MyIntHeader |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getWithaheaderSimulatedTask : String -> Int -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (String)
+getWithaheaderSimulatedTask header_myStringHeader header_MyIntHeader =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -60,8 +70,8 @@ getWithaheaderSimulated toMsg header_myStringHeader header_MyIntHeader =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -75,7 +85,5 @@ getWithaheaderSimulated toMsg header_myStringHeader header_MyIntHeader =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

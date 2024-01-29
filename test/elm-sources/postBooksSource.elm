@@ -8,7 +8,13 @@ import ProgramTest
 
 postBooks : (Result (Maybe (Http.Metadata, String), Http.Error) (NoContent) -> msg) -> Book -> Cmd msg
 postBooks toMsg body =
-    Http.request
+    postBooksTask body |>
+        Task.attempt toMsg
+
+
+postBooksTask : Book -> Task (Maybe (Http.Metadata, String), Http.Error) (NoContent)
+postBooksTask body =
+    Http.task
         { method =
             "POST"
         , headers =
@@ -20,8 +26,8 @@ postBooks toMsg body =
                 ]
         , body =
             Http.jsonBody (encodeBook body)
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -37,14 +43,18 @@ postBooks toMsg body =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 postBooksSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (NoContent) -> msg) -> Book -> ProgramTest.SimulatedEffect msg
 postBooksSimulated toMsg body =
-    SimulatedEffect.Http.request
+    postBooksSimulatedTask body |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+postBooksSimulatedTask : Book -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (NoContent)
+postBooksSimulatedTask body =
+    SimulatedEffect.Http.task
         { method =
             "POST"
         , headers =
@@ -56,8 +66,8 @@ postBooksSimulated toMsg body =
                 ]
         , body =
             SimulatedEffect.Http.jsonBody (encodeBook body)
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -72,7 +82,5 @@ postBooksSimulated toMsg body =
                             
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }
