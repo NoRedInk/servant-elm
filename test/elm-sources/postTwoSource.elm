@@ -37,7 +37,7 @@ postTwoTask body =
                         Http.NetworkError_ -> Err (Nothing, Http.NetworkError)
                         Http.BadStatus_ metadata body_ -> Err (Just (metadata, body_), Http.BadStatus metadata.statusCode)
                         Http.GoodStatus_ metadata body_ ->
-                            (decodeString (maybe int) body_)
+                            (decodeString (nullable int) body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
@@ -76,7 +76,7 @@ postTwoSimulatedTask body =
                         Http.NetworkError_ -> Err (Nothing, Http.NetworkError)
                         Http.BadStatus_ metadata body_ -> Err (Just (metadata, body_), Http.BadStatus metadata.statusCode)
                         Http.GoodStatus_ metadata body_ ->
-                            (decodeString (maybe int) body_)
+                            (decodeString (nullable int) body_)
                                 |> Result.mapError Json.Decode.errorToString
                                 |> Result.mapError Http.BadBody
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
