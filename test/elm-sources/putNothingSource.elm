@@ -8,7 +8,13 @@ import ProgramTest
 
 putNothing : (Result (Maybe (Http.Metadata, String), Http.Error) (()) -> msg) -> Cmd msg
 putNothing toMsg =
-    Http.request
+    putNothingTask |>
+        Task.attempt toMsg
+
+
+putNothingTask : Task (Maybe (Http.Metadata, String), Http.Error) (())
+putNothingTask =
+    Http.task
         { method =
             "PUT"
         , headers =
@@ -20,8 +26,8 @@ putNothing toMsg =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -37,14 +43,18 @@ putNothing toMsg =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 putNothingSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (()) -> msg) -> ProgramTest.SimulatedEffect msg
 putNothingSimulated toMsg =
-    SimulatedEffect.Http.request
+    putNothingSimulatedTask |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+putNothingSimulatedTask : ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (())
+putNothingSimulatedTask =
+    SimulatedEffect.Http.task
         { method =
             "PUT"
         , headers =
@@ -56,8 +66,8 @@ putNothingSimulated toMsg =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -72,7 +82,5 @@ putNothingSimulated toMsg =
                             
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

@@ -10,7 +10,13 @@ import Json.Encode
 
 postTwo : (Result (Maybe (Http.Metadata, String), Http.Error) (Maybe (Int)) -> msg) -> String -> Cmd msg
 postTwo toMsg body =
-    Http.request
+    postTwoTask body |>
+        Task.attempt toMsg
+
+
+postTwoTask : String -> Task (Maybe (Http.Metadata, String), Http.Error) (Maybe (Int))
+postTwoTask body =
+    Http.task
         { method =
             "POST"
         , headers =
@@ -22,8 +28,8 @@ postTwo toMsg body =
                 ]
         , body =
             Http.jsonBody (Json.Encode.string body)
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -38,14 +44,18 @@ postTwo toMsg body =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 postTwoSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Maybe (Int)) -> msg) -> String -> ProgramTest.SimulatedEffect msg
 postTwoSimulated toMsg body =
-    SimulatedEffect.Http.request
+    postTwoSimulatedTask body |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+postTwoSimulatedTask : String -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Maybe (Int))
+postTwoSimulatedTask body =
+    SimulatedEffect.Http.task
         { method =
             "POST"
         , headers =
@@ -57,8 +67,8 @@ postTwoSimulated toMsg body =
                 ]
         , body =
             SimulatedEffect.Http.jsonBody (Json.Encode.string body)
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -72,7 +82,5 @@ postTwoSimulated toMsg body =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

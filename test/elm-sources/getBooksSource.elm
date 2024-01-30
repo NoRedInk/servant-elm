@@ -10,6 +10,12 @@ import Url
 
 getBooks : (Result (Maybe (Http.Metadata, String), Http.Error) (List (Book)) -> msg) -> Bool -> Maybe (String) -> Maybe (Int) -> List (Maybe (Bool)) -> Cmd msg
 getBooks toMsg query_published query_sort query_year query_filters =
+    getBooksTask query_published query_sort query_year query_filters |>
+        Task.attempt toMsg
+
+
+getBooksTask : Bool -> Maybe (String) -> Maybe (Int) -> List (Maybe (Bool)) -> Task (Maybe (Http.Metadata, String), Http.Error) (List (Book))
+getBooksTask query_published query_sort query_year query_filters =
     let
         params =
             List.filter (not << String.isEmpty)
@@ -28,7 +34,7 @@ getBooks toMsg query_published query_sort query_year query_filters =
                     |> String.join "&"
                 ]
     in
-        Http.request
+        Http.task
             { method =
                 "GET"
             , headers =
@@ -44,8 +50,8 @@ getBooks toMsg query_published query_sort query_year query_filters =
                        "?" ++ String.join "&" params
             , body =
                 Http.emptyBody
-            , expect =
-                Http.expectStringResponse toMsg
+            , resolver =
+                Http.stringResolver
                     (\res ->
                         case res of
                             Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -60,13 +66,17 @@ getBooks toMsg query_published query_sort query_year query_filters =
                     )
             , timeout =
                 Nothing
-            , tracker =
-                Nothing
             }
 
 
 getBooksSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (List (Book)) -> msg) -> Bool -> Maybe (String) -> Maybe (Int) -> List (Maybe (Bool)) -> ProgramTest.SimulatedEffect msg
 getBooksSimulated toMsg query_published query_sort query_year query_filters =
+    getBooksSimulatedTask query_published query_sort query_year query_filters |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getBooksSimulatedTask : Bool -> Maybe (String) -> Maybe (Int) -> List (Maybe (Bool)) -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (List (Book))
+getBooksSimulatedTask query_published query_sort query_year query_filters =
     let
         params =
             List.filter (not << String.isEmpty)
@@ -85,7 +95,7 @@ getBooksSimulated toMsg query_published query_sort query_year query_filters =
                     |> String.join "&"
                 ]
     in
-        SimulatedEffect.Http.request
+        SimulatedEffect.Http.task
             { method =
                 "GET"
             , headers =
@@ -101,8 +111,8 @@ getBooksSimulated toMsg query_published query_sort query_year query_filters =
                        "?" ++ String.join "&" params
             , body =
                 SimulatedEffect.Http.emptyBody
-            , expect =
-                SimulatedEffect.Http.expectStringResponse toMsg
+            , resolver =
+                SimulatedEffect.Http.stringResolver
                     (\res ->
                         case res of
                             Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -116,7 +126,5 @@ getBooksSimulated toMsg query_published query_sort query_year query_filters =
                                     |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                     )
             , timeout =
-                Nothing
-            , tracker =
                 Nothing
             }

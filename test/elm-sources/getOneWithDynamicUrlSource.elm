@@ -9,7 +9,13 @@ import Json.Decode exposing (..)
 
 getOne : (Result (Maybe (Http.Metadata, String), Http.Error) (Int) -> msg) -> String -> Cmd msg
 getOne toMsg urlBase =
-    Http.request
+    getOneTask urlBase |>
+        Task.attempt toMsg
+
+
+getOneTask : String -> Task (Maybe (Http.Metadata, String), Http.Error) (Int)
+getOneTask urlBase =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -21,8 +27,8 @@ getOne toMsg urlBase =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -37,14 +43,18 @@ getOne toMsg urlBase =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getOneSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Int) -> msg) -> String -> ProgramTest.SimulatedEffect msg
 getOneSimulated toMsg urlBase =
-    SimulatedEffect.Http.request
+    getOneSimulatedTask urlBase |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getOneSimulatedTask : String -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Int)
+getOneSimulatedTask urlBase =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -56,8 +66,8 @@ getOneSimulated toMsg urlBase =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -71,7 +81,5 @@ getOneSimulated toMsg urlBase =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

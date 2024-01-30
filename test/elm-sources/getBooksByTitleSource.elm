@@ -9,7 +9,13 @@ import Url
 
 getBooksByTitle : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> String -> Cmd msg
 getBooksByTitle toMsg capture_title =
-    Http.request
+    getBooksByTitleTask capture_title |>
+        Task.attempt toMsg
+
+
+getBooksByTitleTask : String -> Task (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksByTitleTask capture_title =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -22,8 +28,8 @@ getBooksByTitle toMsg capture_title =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -38,14 +44,18 @@ getBooksByTitle toMsg capture_title =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getBooksByTitleSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> String -> ProgramTest.SimulatedEffect msg
 getBooksByTitleSimulated toMsg capture_title =
-    SimulatedEffect.Http.request
+    getBooksByTitleSimulatedTask capture_title |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getBooksByTitleSimulatedTask : String -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksByTitleSimulatedTask capture_title =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -58,8 +68,8 @@ getBooksByTitleSimulated toMsg capture_title =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -73,7 +83,5 @@ getBooksByTitleSimulated toMsg capture_title =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }

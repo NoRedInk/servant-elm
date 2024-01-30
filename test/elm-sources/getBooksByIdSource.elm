@@ -9,7 +9,13 @@ import Url
 
 getBooksById : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Int -> Cmd msg
 getBooksById toMsg capture_id =
-    Http.request
+    getBooksByIdTask capture_id |>
+        Task.attempt toMsg
+
+
+getBooksByIdTask : Int -> Task (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksByIdTask capture_id =
+    Http.task
         { method =
             "GET"
         , headers =
@@ -22,8 +28,8 @@ getBooksById toMsg capture_id =
                 ]
         , body =
             Http.emptyBody
-        , expect =
-            Http.expectStringResponse toMsg
+        , resolver =
+            Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -38,14 +44,18 @@ getBooksById toMsg capture_id =
                 )
         , timeout =
             Nothing
-        , tracker =
-            Nothing
         }
 
 
 getBooksByIdSimulated : (Result (Maybe (Http.Metadata, String), Http.Error) (Book) -> msg) -> Int -> ProgramTest.SimulatedEffect msg
 getBooksByIdSimulated toMsg capture_id =
-    SimulatedEffect.Http.request
+    getBooksByIdSimulatedTask capture_id |>
+        SimulatedEffect.Task.attempt toMsg
+
+
+getBooksByIdSimulatedTask : Int -> ProgramTest.SimulatedTask (Maybe (Http.Metadata, String), Http.Error) (Book)
+getBooksByIdSimulatedTask capture_id =
+    SimulatedEffect.Http.task
         { method =
             "GET"
         , headers =
@@ -58,8 +68,8 @@ getBooksByIdSimulated toMsg capture_id =
                 ]
         , body =
             SimulatedEffect.Http.emptyBody
-        , expect =
-            SimulatedEffect.Http.expectStringResponse toMsg
+        , resolver =
+            SimulatedEffect.Http.stringResolver
                 (\res ->
                     case res of
                         Http.BadUrl_ url -> Err (Nothing, Http.BadUrl url)
@@ -73,7 +83,5 @@ getBooksByIdSimulated toMsg capture_id =
                                 |> Result.mapError (Tuple.pair (Just (metadata, body_)))
                 )
         , timeout =
-            Nothing
-        , tracker =
             Nothing
         }
