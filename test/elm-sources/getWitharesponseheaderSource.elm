@@ -19,7 +19,8 @@ getWitharesponseheaderTask =
         { method =
             "GET"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -58,7 +59,8 @@ getWitharesponseheaderSimulatedTask =
         { method =
             "GET"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""

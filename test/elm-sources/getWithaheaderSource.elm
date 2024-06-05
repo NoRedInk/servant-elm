@@ -19,7 +19,8 @@ getWithaheaderTask header_myStringHeader header_MyIntHeader =
         { method =
             "GET"
         , headers =
-            [ Http.header "myStringHeader" (header_myStringHeader)
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            , Http.header "myStringHeader" (header_myStringHeader)
             , Http.header "MyIntHeader" (String.fromInt header_MyIntHeader)
             ]
         , url =
@@ -60,7 +61,8 @@ getWithaheaderSimulatedTask header_myStringHeader header_MyIntHeader =
         { method =
             "GET"
         , headers =
-            [ SimulatedEffect.Http.header "myStringHeader" (header_myStringHeader)
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            , SimulatedEffect.Http.header "myStringHeader" (header_myStringHeader)
             , SimulatedEffect.Http.header "MyIntHeader" (String.fromInt header_MyIntHeader)
             ]
         , url =

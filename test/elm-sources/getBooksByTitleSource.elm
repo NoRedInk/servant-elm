@@ -19,7 +19,8 @@ getBooksByTitleTask capture_title =
         { method =
             "GET"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -59,7 +60,8 @@ getBooksByTitleSimulatedTask capture_title =
         { method =
             "GET"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""

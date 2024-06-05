@@ -19,7 +19,8 @@ getOneTask urlBase =
         { method =
             "GET"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ urlBase
@@ -58,7 +59,8 @@ getOneSimulatedTask urlBase =
         { method =
             "GET"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ urlBase

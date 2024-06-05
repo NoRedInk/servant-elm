@@ -19,7 +19,8 @@ getBooksByIdTask capture_id =
         { method =
             "GET"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -59,7 +60,8 @@ getBooksByIdSimulatedTask capture_id =
         { method =
             "GET"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""

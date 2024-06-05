@@ -20,7 +20,8 @@ postTwoTask body =
         { method =
             "POST"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -59,7 +60,8 @@ postTwoSimulatedTask body =
         { method =
             "POST"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
