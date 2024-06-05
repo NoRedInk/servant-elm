@@ -18,7 +18,8 @@ putNothingTask =
         { method =
             "PUT"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -58,7 +59,8 @@ putNothingSimulatedTask =
         { method =
             "PUT"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""

@@ -58,8 +58,6 @@ type TestApi =
          :> Header "myStringHeader" String
          :> Header "MyIntHeader" Int
          :> Get '[JSON] String
-  :<|> "with-a-response-header"
-         :> Get '[JSON] (Headers '[Header "myResponse" String] String)
   :<|> "books-by-author"
          :> Capture "author" Author
          :> Header "Id" Id

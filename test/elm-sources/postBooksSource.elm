@@ -18,7 +18,8 @@ postBooksTask body =
         { method =
             "POST"
         , headers =
-            []
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""
@@ -58,7 +59,8 @@ postBooksSimulatedTask body =
         { method =
             "POST"
         , headers =
-            []
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            ]
         , url =
             String.join "/"
                 [ ""

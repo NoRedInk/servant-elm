@@ -20,7 +20,8 @@ getBooksbyauthorByAuthorTask header_Id capture_author =
         { method =
             "GET"
         , headers =
-            [ Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
+            [ Http.header "X-Requested-With" "XMLHttpRequest"
+            , Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
             ]
         , url =
             String.join "/"
@@ -61,7 +62,8 @@ getBooksbyauthorByAuthorSimulatedTask header_Id capture_author =
         { method =
             "GET"
         , headers =
-            [ SimulatedEffect.Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
+            [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+            , SimulatedEffect.Http.header "Id" ((\(Id inner) -> String.fromInt inner) header_Id)
             ]
         , url =
             String.join "/"

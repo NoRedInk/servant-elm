@@ -435,14 +435,18 @@ mkRequest httpLib opts request =
     method =
        request ^. F.reqMethod . to (stext . T.decodeUtf8)
 
+    -- This is checked by rails for CSRF protection
+    xRequestedWithHeader = httpLib <> ".header" <+> dquotes "X-Requested-With" <+> dquotes "XMLHttpRequest"
+
     headers =
-        -- Headers are always wrapped in a `Maybe`, but we don't want them to be.
-        [ httpLib <> ".header" <+> dquotes headerName <+>
-            parens (toStringSrc "" opts (header ^. F.headerArg . F.argType . to unMaybe) <> headerArgName)
-        | header <- request ^. F.reqHeaders
-        , headerName <- [header ^. F.headerArg . F.argName . to (stext . F.unPathSegment)]
-        , headerArgName <- [elmHeaderArg header]
-        ]
+        xRequestedWithHeader :
+          -- Headers are always wrapped in a `Maybe`, but we don't want them to be.
+          [ httpLib <> ".header" <+> dquotes headerName <+>
+              parens (toStringSrc "" opts (header ^. F.headerArg . F.argType . to unMaybe) <> headerArgName)
+          | header <- request ^. F.reqHeaders
+          , headerName <- [header ^. F.headerArg . F.argName . to (stext . F.unPathSegment)]
+          , headerArgName <- [elmHeaderArg header]
+          ]
 
     url =
       mkUrl opts (request ^. F.reqUrl . F.path)

@@ -38,7 +38,8 @@ getBooksTask query_published query_sort query_year query_filters =
             { method =
                 "GET"
             , headers =
-                []
+                [ Http.header "X-Requested-With" "XMLHttpRequest"
+                ]
             , url =
                 String.join "/"
                     [ ""
@@ -99,7 +100,8 @@ getBooksSimulatedTask query_published query_sort query_year query_filters =
             { method =
                 "GET"
             , headers =
-                []
+                [ SimulatedEffect.Http.header "X-Requested-With" "XMLHttpRequest"
+                ]
             , url =
                 String.join "/"
                     [ ""
