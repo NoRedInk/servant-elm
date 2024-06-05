@@ -1,13 +1,12 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleInstances #-}
 module Common where
 
 import           Data.Aeson   (ToJSON)
 import           Data.Proxy   (Proxy (Proxy))
 import           Data.Text    (Text)
-import           Elm          (ElmType, ElmType(..), ElmDatatype(..), ElmPrimitive(..))
+import           Elm          (ElmType)
 import           GHC.Generics (Generic)
 import           Servant.API  ((:<|>), (:>), Capture, Get, GetNoContent, Header,
                                Headers, JSON, NoContent, Post, PostNoContent,
@@ -29,9 +28,6 @@ newtype Id = Id Int
   deriving (Generic)
 
 instance ElmType Id
-
-instance ElmType (Headers a String) where
-  toElmType _ = ElmPrimitive EString
 
 type TestApi =
        "one"
@@ -62,8 +58,6 @@ type TestApi =
          :> Header "myStringHeader" String
          :> Header "MyIntHeader" Int
          :> Get '[JSON] String
-  :<|> "with-a-response-header"
-         :> Get '[JSON] (Headers '[Header "myResponse" String] String)
   :<|> "books-by-author"
          :> Capture "author" Author
          :> Header "Id" Id

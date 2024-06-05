@@ -94,13 +94,6 @@ spec = do
                               "import ProgramTest\n" <>
                               "import String.Conversions as String\n" <>
                               "import Json.Decode exposing (..)\n\n\n")
-                          , ( "test/elm-sources/getWitharesponseheaderSource.elm"
-                            , "module GetWithAResponseHeaderSource exposing (..)\n\n" <>
-                              "import Http\n" <>
-                              "import SimulatedEffect.Http\n" <>
-                              "import ProgramTest\n" <>
-                              "import String.Conversions as String\n" <>
-                              "import Json.Decode exposing (..)\n\n\n")
                           , ( "test/elm-sources/getBooksByAuthor.elm"
                             , "module GetBooksByAuthor exposing (..)\n\n" <>
                               "import Http\n" <>
